@@ -253,3 +253,19 @@ Das bedeutet:
 - automatisierte Druckerprüfungen
 - lokale Service-Wrapper und HTTP-APIs
 - Integrationen, die maschinenlesbare JSON-Ausgabe benötigen
+
+### License
+
+This project is licensed under the **GNU Affero General Public License v3.0 (AGPL-3.0)**.
+
+**Copyright (c) 2026 Andreas Rottmann**
+
+See the [LICENSE](./LICENSE) file for details.
+
+### Lizenz
+
+Dieses Projekt ist unter der **GNU Affero General Public License v3.0 (AGPL-3.0)** lizenziert.
+
+**Copyright (c) 2026 Andreas Rottmann**
+
+Details stehen in der Datei [LICENSE](./LICENSE).
