@@ -1,5 +1,4 @@
 using System.ComponentModel;
-using System.Globalization;
 using System.Text.Json;
 using Dnp.Core;
 using Dnp.Transport.Linux;
@@ -34,7 +33,7 @@ internal static class ProgramEntry
 
             return options.Command switch
             {
-                "info" or "probe" => WriteInfo(options.Json, await client.ProbeAsync().ConfigureAwait(false), ResolvePrinterModel(options)),
+                "info" or "probe" => WriteInfo(options.Json, await client.ProbeAsync().ConfigureAwait(false), ResolvePrinterModel(options), ResolveDetectedModel(options)),
                 "status" => WriteStatus(options.Json, await client.GetPrinterStatusAsync().ConfigureAwait(false)),
                 "remaining" => Write(options.Json, await client.GetRemainingPrintsAsync().ConfigureAwait(false)),
                 "media" => Write(options.Json, await client.GetMediaTypeAsync().ConfigureAwait(false)),
@@ -179,7 +178,7 @@ internal static class ProgramEntry
         return 0;
     }
 
-    private static int WriteInfo(bool json, PrinterProbeResult probe, string? printerModel)
+    private static int WriteInfo(bool json, PrinterProbeResult probe, string? printerModel, string? printerModelRaw = null)
     {
         object? remainingValue = probe.RemainingPrints.Count.HasValue
             ? probe.RemainingPrints.Count.Value
@@ -196,10 +195,15 @@ internal static class ProgramEntry
             {
                 ["message"] = "succes",
                 ["Printermodel"] = printerModel ?? "unknown",
+                ["Printermodel_raw"] = printerModelRaw,
                 ["status"] = statusText,
+                ["status_raw"] = probe.Status.RawCode,
                 ["Remaining prints"] = remainingValue,
+                ["Remaining prints_raw"] = probe.RemainingPrints.RawValue,
                 ["Media"] = mediaText,
-                ["Free buffer"] = freeBufferValue
+                ["Media_raw"] = probe.MediaType.RawValue,
+                ["Free buffer"] = freeBufferValue,
+                ["Free buffer_raw"] = probe.FreeBuffer.RawValue
             };
 
             Console.WriteLine(JsonSerializer.Serialize(payload, JsonOptions));
@@ -208,10 +212,15 @@ internal static class ProgramEntry
 
         Console.WriteLine("message: succes");
         Console.WriteLine($"Printermodel: {printerModel ?? "unknown"}");
+        Console.WriteLine($"Printermodel_raw: {printerModelRaw ?? "n/a"}");
         Console.WriteLine($"status: {statusText}");
+        Console.WriteLine($"status_raw: {probe.Status.RawCode}");
         Console.WriteLine($"Remaining prints: {remainingValue}");
+        Console.WriteLine($"Remaining prints_raw: {probe.RemainingPrints.RawValue}");
         Console.WriteLine($"Media: {mediaText}");
+        Console.WriteLine($"Media_raw: {probe.MediaType.RawValue}");
         Console.WriteLine($"Free buffer: {freeBufferValue}");
+        Console.WriteLine($"Free buffer_raw: {probe.FreeBuffer.RawValue}");
         return 0;
     }
 
@@ -268,7 +277,30 @@ internal static class ProgramEntry
             }
         }
 
-        return null;
+        return ResolveDetectedModel(options);
+    }
+
+    private static string? ResolveDetectedModel(CliOptions options)
+    {
+        if (options.Simulate)
+        {
+            return options.Model ?? (OperatingSystem.IsWindows() ? "QW410" : "DS620");
+        }
+
+        if (!OperatingSystem.IsWindows() && !OperatingSystem.IsLinux())
+        {
+            return null;
+        }
+
+        try
+        {
+            var detection = DetectPrinter(options);
+            return detection.Model ?? ResolvePrinterModelFromVidPid(detection.VendorId, detection.ProductId);
+        }
+        catch
+        {
+            return null;
+        }
     }
 
     private static string? ResolvePrinterModelFromWindowsDevicePath(string? devicePath)
@@ -363,7 +395,7 @@ internal static class ProgramEntry
         Console.WriteLine();
         Console.WriteLine("Outputs:");
         Console.WriteLine("  detect  -> message, VID, PID, Printermodel, device_id.");
-        Console.WriteLine("  info    -> message, Printermodel, status, Remaining prints, Media, Free buffer.");
+        Console.WriteLine("  info    -> message, Printermodel, Printermodel_raw, status, status_raw, Remaining prints, Remaining prints_raw, Media, Media_raw, Free buffer, Free buffer_raw.");
         Console.WriteLine("  status  -> message, status.");
         Console.WriteLine();
         Console.WriteLine("Options:");
@@ -377,6 +409,7 @@ internal static class ProgramEntry
         Console.WriteLine("  --read-timeout-ms 5000");
         Console.WriteLine("  --post-write-delay-ms 75");
     }
+
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
@@ -506,7 +539,6 @@ internal sealed record CliOptions(
 
     private static int GetIntOption(IReadOnlyList<string> args, string name, int defaultValue)
         => GetNullableIntOption(args, name) ?? defaultValue;
-
 
     private static int? GetNullableIntOption(IReadOnlyList<string> args, string name)
         => int.TryParse(GetOption(args, name), out var value) ? value : null;

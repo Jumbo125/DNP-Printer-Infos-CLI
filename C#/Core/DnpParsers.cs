@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.RegularExpressions;
 
 namespace Dnp.Core;
@@ -67,7 +68,7 @@ public static partial class DnpParsers
         int status;
         if (normalized.StartsWith("0x", StringComparison.OrdinalIgnoreCase))
         {
-            if (!int.TryParse(normalized[2..], System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture, out status))
+            if (!int.TryParse(normalized[2..], NumberStyles.HexNumber, CultureInfo.InvariantCulture, out status))
             {
                 info = new PrinterStatusInfo(raw, PrinterStatusKind.Unknown, "Unknown");
                 return false;
@@ -79,20 +80,51 @@ public static partial class DnpParsers
             return false;
         }
 
+        var rawCode = $"0x{status:X8}";
         info = status switch
         {
-            0x00010001 => new PrinterStatusInfo($"0x{status:X8}", PrinterStatusKind.Idle, "Idle"),
-            0x00010002 => new PrinterStatusInfo($"0x{status:X8}", PrinterStatusKind.Printing, "Printing"),
-            0x00010020 => new PrinterStatusInfo($"0x{status:X8}", PrinterStatusKind.Cooling, "Cooling"),
-            0x00020001 => new PrinterStatusInfo($"0x{status:X8}", PrinterStatusKind.CoverOpen, "Cover open"),
-            0x00010008 => new PrinterStatusInfo($"0x{status:X8}", PrinterStatusKind.PaperEnd, "Paper end"),
-            0x00010010 => new PrinterStatusInfo($"0x{status:X8}", PrinterStatusKind.RibbonEnd, "Ribbon end"),
-            0x00020002 => new PrinterStatusInfo($"0x{status:X8}", PrinterStatusKind.PaperJam, "Paper jam"),
-            0x00020004 => new PrinterStatusInfo($"0x{status:X8}", PrinterStatusKind.RibbonError, "Ribbon error"),
-            0x00020008 => new PrinterStatusInfo($"0x{status:X8}", PrinterStatusKind.PaperDefinitionError, "Paper error"),
-            0x00020020 => new PrinterStatusInfo($"0x{status:X8}", PrinterStatusKind.SystemError, "Scrapbox error"),
-            _ => new PrinterStatusInfo($"0x{status:X8}", PrinterStatusKind.Unknown, "Unknown")
+            0x00000000 => new PrinterStatusInfo(rawCode, PrinterStatusKind.Idle, "Idle (compat)"),
+            0x00010001 => new PrinterStatusInfo(rawCode, PrinterStatusKind.Idle, "Idle"),
+            0x00010002 => new PrinterStatusInfo(rawCode, PrinterStatusKind.Printing, "Printing"),
+            0x00010020 => new PrinterStatusInfo(rawCode, PrinterStatusKind.Idle, "Standstill"),
+            0x00010040 => new PrinterStatusInfo(rawCode, PrinterStatusKind.Cooling, "Cooling"),
+            0x00020001 => new PrinterStatusInfo(rawCode, PrinterStatusKind.CoverOpen, "Cover open"),
+            0x00010008 => new PrinterStatusInfo(rawCode, PrinterStatusKind.PaperEnd, "Paper end"),
+            0x00010010 => new PrinterStatusInfo(rawCode, PrinterStatusKind.RibbonEnd, "Ribbon end"),
+            0x00020002 => new PrinterStatusInfo(rawCode, PrinterStatusKind.PaperJam, "Paper jam"),
+            0x00020004 => new PrinterStatusInfo(rawCode, PrinterStatusKind.RibbonError, "Ribbon error"),
+            0x00020008 => new PrinterStatusInfo(rawCode, PrinterStatusKind.PaperDefinitionError, "Paper error"),
+            0x00020010 => new PrinterStatusInfo(rawCode, PrinterStatusKind.DataError, "Data error"),
+            0x00020020 => new PrinterStatusInfo(rawCode, PrinterStatusKind.SystemError, "Scrap box error"),
+            0x00040000 => new PrinterStatusInfo(rawCode, PrinterStatusKind.HardwareError, "Hardware error"),
+            0x00080000 => new PrinterStatusInfo(rawCode, PrinterStatusKind.SystemError, "System error"),
+            0x00100001 => new PrinterStatusInfo(rawCode, PrinterStatusKind.FlashProgramming, "Flash programming idle"),
+            0x00100002 => new PrinterStatusInfo(rawCode, PrinterStatusKind.FlashProgramming, "Flash programming writing"),
+            0x00100004 => new PrinterStatusInfo(rawCode, PrinterStatusKind.FlashProgramming, "Flash programming finished"),
+            0x00100008 => new PrinterStatusInfo(rawCode, PrinterStatusKind.FlashProgramming, "Flash programming data error"),
+            0x00100010 => new PrinterStatusInfo(rawCode, PrinterStatusKind.FlashProgramming, "Flash programming device error"),
+            0x00100020 => new PrinterStatusInfo(rawCode, PrinterStatusKind.FlashProgramming, "Flash programming other error"),
+            0x00200011 => new PrinterStatusInfo(rawCode, PrinterStatusKind.UnitError, "Unit error: jamming supply"),
+            0x00200013 => new PrinterStatusInfo(rawCode, PrinterStatusKind.UnitError, "Unit error: jamming pass"),
+            0x00200017 => new PrinterStatusInfo(rawCode, PrinterStatusKind.UnitError, "Unit error: jamming shell"),
+            0x0020001B => new PrinterStatusInfo(rawCode, PrinterStatusKind.UnitError, "Unit error: jamming eject"),
+            0x0020001E => new PrinterStatusInfo(rawCode, PrinterStatusKind.UnitError, "Unit error: jamming remove"),
+            0x00200031 => new PrinterStatusInfo(rawCode, PrinterStatusKind.UnitError, "Unit error: capstan motor"),
+            0x00200041 => new PrinterStatusInfo(rawCode, PrinterStatusKind.UnitError, "Unit error: shell motor"),
+            0x00200051 => new PrinterStatusInfo(rawCode, PrinterStatusKind.UnitError, "Unit error: pinch"),
+            0x00200061 => new PrinterStatusInfo(rawCode, PrinterStatusKind.UnitError, "Unit error: pass guide"),
+            0x00200071 => new PrinterStatusInfo(rawCode, PrinterStatusKind.UnitError, "Unit error: skew guide"),
+            0x00200081 => new PrinterStatusInfo(rawCode, PrinterStatusKind.UnitError, "Unit error: skew reject"),
+            0x00200091 => new PrinterStatusInfo(rawCode, PrinterStatusKind.UnitError, "Unit error: shell rotate"),
+            0x002000A1 => new PrinterStatusInfo(rawCode, PrinterStatusKind.UnitError, "Unit error: lever"),
+            0x002000B1 => new PrinterStatusInfo(rawCode, PrinterStatusKind.UnitError, "Unit error: cutter"),
+            0x002000C1 => new PrinterStatusInfo(rawCode, PrinterStatusKind.UnitError, "Unit error: tray out"),
+            0x002000D1 => new PrinterStatusInfo(rawCode, PrinterStatusKind.UnitError, "Unit error: cover out"),
+            0x002000F1 => new PrinterStatusInfo(rawCode, PrinterStatusKind.UnitError, "Unit error: system"),
+            _ when (status & unchecked((int)0xFFF00000)) == 0x00200000 => new PrinterStatusInfo(rawCode, PrinterStatusKind.UnitError, "Unit error"),
+            _ => new PrinterStatusInfo(rawCode, PrinterStatusKind.Unknown, "Unknown")
         };
+
         return true;
     }
 

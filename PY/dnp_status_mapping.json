@@ -1,0 +1,330 @@
+[
+  {
+    "enum_value": 0,
+    "enum_name": "STATUS_UNKNOWN",
+    "raw_code": null,
+    "raw_hex": null,
+    "category": "meta/ui",
+    "notes": "Interner Sonderzustand; kein nativer DNP-Rawcode in der Mapping-Logik gefunden"
+  },
+  {
+    "enum_value": 1,
+    "enum_name": "STATUS_OK",
+    "raw_code": 65537,
+    "raw_hex": "0x00010001",
+    "category": "usually",
+    "notes": "Idle / bereit"
+  },
+  {
+    "enum_value": 1,
+    "enum_name": "STATUS_OK",
+    "raw_code": 65538,
+    "raw_hex": "0x00010002",
+    "category": "usually",
+    "notes": "Printing/standstill-nahe OK-Zustand; EXE mappt ebenfalls auf STATUS_OK"
+  },
+  {
+    "enum_value": 1,
+    "enum_name": "STATUS_OK",
+    "raw_code": 65568,
+    "raw_hex": "0x00010020",
+    "category": "usually",
+    "notes": "Standstill; EXE mappt auf STATUS_OK"
+  },
+  {
+    "enum_value": 2,
+    "enum_name": "STATUS_NOSTATUS",
+    "raw_code": null,
+    "raw_hex": null,
+    "category": "meta/ui",
+    "notes": "Interner Sonderzustand; kein nativer DNP-Rawcode in der Mapping-Logik gefunden"
+  },
+  {
+    "enum_value": 3,
+    "enum_name": "STATUS_PAPEROUT",
+    "raw_code": 65544,
+    "raw_hex": "0x00010008",
+    "category": "usually",
+    "notes": "Paper End"
+  },
+  {
+    "enum_value": 4,
+    "enum_name": "STATUS_RIBBONOUT",
+    "raw_code": 65552,
+    "raw_hex": "0x00010010",
+    "category": "usually",
+    "notes": "Ribbon End"
+  },
+  {
+    "enum_value": 5,
+    "enum_name": "STATUS_COVEROPEN",
+    "raw_code": 131073,
+    "raw_hex": "0x00020001",
+    "category": "setting",
+    "notes": "Cover Open"
+  },
+  {
+    "enum_value": 6,
+    "enum_name": "STATUS_RIBBONERR",
+    "raw_code": 131076,
+    "raw_hex": "0x00020004",
+    "category": "setting",
+    "notes": "Ribbon Error"
+  },
+  {
+    "enum_value": 7,
+    "enum_name": "STATUS_PAPERERR",
+    "raw_code": 131080,
+    "raw_hex": "0x00020008",
+    "category": "setting",
+    "notes": "Paper Error / Media-Setting-Fehler"
+  },
+  {
+    "enum_value": 8,
+    "enum_name": "STATUS_PAPERJAM",
+    "raw_code": 131074,
+    "raw_hex": "0x00020002",
+    "category": "setting",
+    "notes": "Paper Jam"
+  },
+  {
+    "enum_value": 9,
+    "enum_name": "STATUS_SCRAPBOXERR",
+    "raw_code": 131104,
+    "raw_hex": "0x00020020",
+    "category": "setting",
+    "notes": "Scrap Box Error"
+  },
+  {
+    "enum_value": 10,
+    "enum_name": "STATUS_MOTCOOLING",
+    "raw_code": 65600,
+    "raw_hex": "0x00010040",
+    "category": "usually",
+    "notes": "Cooling / Motor Cooling"
+  },
+  {
+    "enum_value": 11,
+    "enum_name": "STATUS_DATAERR",
+    "raw_code": 131088,
+    "raw_hex": "0x00020010",
+    "category": "setting",
+    "notes": "Data Error"
+  },
+  {
+    "enum_value": 12,
+    "enum_name": "STATUS_SYSTEMERR",
+    "raw_code": 524288,
+    "raw_hex": "0x00080000",
+    "category": "system",
+    "notes": "System Error"
+  },
+  {
+    "enum_value": 13,
+    "enum_name": "STATUS_HARDWAREERR",
+    "raw_code": 262144,
+    "raw_hex": "0x00040000",
+    "category": "hardware",
+    "notes": "Hardware Error"
+  },
+  {
+    "enum_value": 14,
+    "enum_name": "STATUS_NOT_INITIALIZED",
+    "raw_code": null,
+    "raw_hex": null,
+    "category": "meta/ui",
+    "notes": "Interner Sonderzustand; kein nativer DNP-Rawcode in der Mapping-Logik gefunden"
+  },
+  {
+    "enum_value": 15,
+    "enum_name": "STATUS_OFFLINE",
+    "raw_code": null,
+    "raw_hex": null,
+    "category": "meta/ui",
+    "notes": "Interner Sonderzustand; kein nativer DNP-Rawcode in der Mapping-Logik gefunden"
+  },
+  {
+    "enum_value": 16,
+    "enum_name": "UNIT_ERROR_JAMMING_SUPPLY",
+    "raw_code": 2097169,
+    "raw_hex": "0x00200011",
+    "category": "dunit",
+    "notes": "Unit Error"
+  },
+  {
+    "enum_value": 17,
+    "enum_name": "UNIT_ERROR_JAMMING_PASS",
+    "raw_code": 2097171,
+    "raw_hex": "0x00200013",
+    "category": "dunit",
+    "notes": "Unit Error"
+  },
+  {
+    "enum_value": 18,
+    "enum_name": "UNIT_ERROR_JAMMING_SHELL",
+    "raw_code": 2097175,
+    "raw_hex": "0x00200017",
+    "category": "dunit",
+    "notes": "Unit Error"
+  },
+  {
+    "enum_value": 19,
+    "enum_name": "UNIT_ERROR_JAMMING_EJECT",
+    "raw_code": 2097179,
+    "raw_hex": "0x0020001B",
+    "category": "dunit",
+    "notes": "Unit Error"
+  },
+  {
+    "enum_value": 20,
+    "enum_name": "UNIT_ERROR_JAMMING_REMOVE",
+    "raw_code": 2097182,
+    "raw_hex": "0x0020001E",
+    "category": "dunit",
+    "notes": "Unit Error"
+  },
+  {
+    "enum_value": 21,
+    "enum_name": "UNIT_ERROR_CAPSTAN_MOTOR",
+    "raw_code": 2097201,
+    "raw_hex": "0x00200031",
+    "category": "dunit",
+    "notes": "Unit Error"
+  },
+  {
+    "enum_value": 22,
+    "enum_name": "UNIT_ERROR_SHELL_MOTOR",
+    "raw_code": 2097217,
+    "raw_hex": "0x00200041",
+    "category": "dunit",
+    "notes": "Unit Error"
+  },
+  {
+    "enum_value": 23,
+    "enum_name": "UNIT_ERROR_PINCH",
+    "raw_code": 2097233,
+    "raw_hex": "0x00200051",
+    "category": "dunit",
+    "notes": "Unit Error"
+  },
+  {
+    "enum_value": 24,
+    "enum_name": "UNIT_ERROR_PASS_GUIDE",
+    "raw_code": 2097249,
+    "raw_hex": "0x00200061",
+    "category": "dunit",
+    "notes": "Unit Error"
+  },
+  {
+    "enum_value": 25,
+    "enum_name": "UNIT_ERROR_SKEW_GUIDE",
+    "raw_code": 2097265,
+    "raw_hex": "0x00200071",
+    "category": "dunit",
+    "notes": "Unit Error"
+  },
+  {
+    "enum_value": 26,
+    "enum_name": "UNIT_ERROR_SKEW_REJECT",
+    "raw_code": 2097281,
+    "raw_hex": "0x00200081",
+    "category": "dunit",
+    "notes": "Unit Error"
+  },
+  {
+    "enum_value": 27,
+    "enum_name": "UNIT_ERROR_SHELL_ROTATE",
+    "raw_code": 2097297,
+    "raw_hex": "0x00200091",
+    "category": "dunit",
+    "notes": "Unit Error"
+  },
+  {
+    "enum_value": 28,
+    "enum_name": "UNIT_ERROR_LEVER",
+    "raw_code": 2097313,
+    "raw_hex": "0x002000A1",
+    "category": "dunit",
+    "notes": "Unit Error"
+  },
+  {
+    "enum_value": 29,
+    "enum_name": "UNIT_ERROR_CUTTER",
+    "raw_code": 2097329,
+    "raw_hex": "0x002000B1",
+    "category": "dunit",
+    "notes": "Unit Error"
+  },
+  {
+    "enum_value": 30,
+    "enum_name": "UNIT_ERROR_TRAY_OUT",
+    "raw_code": 2097345,
+    "raw_hex": "0x002000C1",
+    "category": "dunit",
+    "notes": "Unit Error"
+  },
+  {
+    "enum_value": 31,
+    "enum_name": "UNIT_ERROR_COVER_OUT",
+    "raw_code": 2097361,
+    "raw_hex": "0x002000D1",
+    "category": "dunit",
+    "notes": "Unit Error"
+  },
+  {
+    "enum_value": 32,
+    "enum_name": "UNIT_ERROR_SYSTEM",
+    "raw_code": 2097393,
+    "raw_hex": "0x002000F1",
+    "category": "dunit",
+    "notes": "Unit Error"
+  },
+  {
+    "enum_value": 33,
+    "enum_name": "STATUS_FLSHPROG_IDLE",
+    "raw_code": 1048577,
+    "raw_hex": "0x00100001",
+    "category": "flshprog",
+    "notes": "Flash programming"
+  },
+  {
+    "enum_value": 34,
+    "enum_name": "STATUS_FLSHPROG_WRITING",
+    "raw_code": 1048578,
+    "raw_hex": "0x00100002",
+    "category": "flshprog",
+    "notes": "Flash programming"
+  },
+  {
+    "enum_value": 35,
+    "enum_name": "STATUS_FLSHPROG_FINISHED",
+    "raw_code": 1048580,
+    "raw_hex": "0x00100004",
+    "category": "flshprog",
+    "notes": "Flash programming"
+  },
+  {
+    "enum_value": 36,
+    "enum_name": "STATUS_FLSHPROG_DATA_ERR1",
+    "raw_code": 1048584,
+    "raw_hex": "0x00100008",
+    "category": "flshprog",
+    "notes": "Flash programming"
+  },
+  {
+    "enum_value": 37,
+    "enum_name": "STATUS_FLSHPROG_DEVICE_ERR1",
+    "raw_code": 1048592,
+    "raw_hex": "0x00100010",
+    "category": "flshprog",
+    "notes": "Flash programming"
+  },
+  {
+    "enum_value": 38,
+    "enum_name": "STATUS_FLSHPROG_OTHERS_ERR1",
+    "raw_code": 1048608,
+    "raw_hex": "0x00100020",
+    "category": "flshprog",
+    "notes": "Flash programming"
+  }
+]

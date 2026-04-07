@@ -14,7 +14,10 @@ public enum PrinterStatusKind
     PaperDefinitionError,
     DataError,
     RfidModuleError,
-    SystemError
+    SystemError,
+    HardwareError,
+    UnitError,
+    FlashProgramming
 }
 
 public sealed record PrinterStatusInfo(string RawCode, PrinterStatusKind Status, string Description);

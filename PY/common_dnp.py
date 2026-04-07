@@ -91,6 +91,9 @@ class PrinterStatusKind(enum.Enum):
     DATA_ERROR = 10
     RFID_MODULE_ERROR = 11
     SYSTEM_ERROR = 12
+    HARDWARE_ERROR = 13
+    UNIT_ERROR = 14
+    FLASH_PROGRAMMING = 15
 
 
 @dataclass(frozen=True)
@@ -236,19 +239,52 @@ class DnpParsers:
         except ValueError:
             return None
 
+        raw_code = f"0x{status:08X}"
         mapping = {
-            0x00010001: PrinterStatusInfo(f"0x{status:08X}", PrinterStatusKind.IDLE, "Idle"),
-            0x00010002: PrinterStatusInfo(f"0x{status:08X}", PrinterStatusKind.PRINTING, "Printing"),
-            0x00010020: PrinterStatusInfo(f"0x{status:08X}", PrinterStatusKind.COOLING, "Cooling"),
-            0x00020001: PrinterStatusInfo(f"0x{status:08X}", PrinterStatusKind.COVER_OPEN, "Cover open"),
-            0x00010008: PrinterStatusInfo(f"0x{status:08X}", PrinterStatusKind.PAPER_END, "Paper end"),
-            0x00010010: PrinterStatusInfo(f"0x{status:08X}", PrinterStatusKind.RIBBON_END, "Ribbon end"),
-            0x00020002: PrinterStatusInfo(f"0x{status:08X}", PrinterStatusKind.PAPER_JAM, "Paper jam"),
-            0x00020004: PrinterStatusInfo(f"0x{status:08X}", PrinterStatusKind.RIBBON_ERROR, "Ribbon error"),
-            0x00020008: PrinterStatusInfo(f"0x{status:08X}", PrinterStatusKind.PAPER_DEFINITION_ERROR, "Paper error"),
-            0x00020020: PrinterStatusInfo(f"0x{status:08X}", PrinterStatusKind.SYSTEM_ERROR, "Scrapbox error"),
+            0x00000000: PrinterStatusInfo(raw_code, PrinterStatusKind.IDLE, "Idle (compat)"),
+            0x00010001: PrinterStatusInfo(raw_code, PrinterStatusKind.IDLE, "Idle"),
+            0x00010002: PrinterStatusInfo(raw_code, PrinterStatusKind.PRINTING, "Printing"),
+            0x00010020: PrinterStatusInfo(raw_code, PrinterStatusKind.IDLE, "Standstill"),
+            0x00010040: PrinterStatusInfo(raw_code, PrinterStatusKind.COOLING, "Cooling"),
+            0x00020001: PrinterStatusInfo(raw_code, PrinterStatusKind.COVER_OPEN, "Cover open"),
+            0x00010008: PrinterStatusInfo(raw_code, PrinterStatusKind.PAPER_END, "Paper end"),
+            0x00010010: PrinterStatusInfo(raw_code, PrinterStatusKind.RIBBON_END, "Ribbon end"),
+            0x00020002: PrinterStatusInfo(raw_code, PrinterStatusKind.PAPER_JAM, "Paper jam"),
+            0x00020004: PrinterStatusInfo(raw_code, PrinterStatusKind.RIBBON_ERROR, "Ribbon error"),
+            0x00020008: PrinterStatusInfo(raw_code, PrinterStatusKind.PAPER_DEFINITION_ERROR, "Paper error"),
+            0x00020010: PrinterStatusInfo(raw_code, PrinterStatusKind.DATA_ERROR, "Data error"),
+            0x00020020: PrinterStatusInfo(raw_code, PrinterStatusKind.SYSTEM_ERROR, "Scrap box error"),
+            0x00040000: PrinterStatusInfo(raw_code, PrinterStatusKind.HARDWARE_ERROR, "Hardware error"),
+            0x00080000: PrinterStatusInfo(raw_code, PrinterStatusKind.SYSTEM_ERROR, "System error"),
+            0x00100001: PrinterStatusInfo(raw_code, PrinterStatusKind.FLASH_PROGRAMMING, "Flash programming idle"),
+            0x00100002: PrinterStatusInfo(raw_code, PrinterStatusKind.FLASH_PROGRAMMING, "Flash programming writing"),
+            0x00100004: PrinterStatusInfo(raw_code, PrinterStatusKind.FLASH_PROGRAMMING, "Flash programming finished"),
+            0x00100008: PrinterStatusInfo(raw_code, PrinterStatusKind.FLASH_PROGRAMMING, "Flash programming data error"),
+            0x00100010: PrinterStatusInfo(raw_code, PrinterStatusKind.FLASH_PROGRAMMING, "Flash programming device error"),
+            0x00100020: PrinterStatusInfo(raw_code, PrinterStatusKind.FLASH_PROGRAMMING, "Flash programming other error"),
+            0x00200011: PrinterStatusInfo(raw_code, PrinterStatusKind.UNIT_ERROR, "Unit error: jamming supply"),
+            0x00200013: PrinterStatusInfo(raw_code, PrinterStatusKind.UNIT_ERROR, "Unit error: jamming pass"),
+            0x00200017: PrinterStatusInfo(raw_code, PrinterStatusKind.UNIT_ERROR, "Unit error: jamming shell"),
+            0x0020001B: PrinterStatusInfo(raw_code, PrinterStatusKind.UNIT_ERROR, "Unit error: jamming eject"),
+            0x0020001E: PrinterStatusInfo(raw_code, PrinterStatusKind.UNIT_ERROR, "Unit error: jamming remove"),
+            0x00200031: PrinterStatusInfo(raw_code, PrinterStatusKind.UNIT_ERROR, "Unit error: capstan motor"),
+            0x00200041: PrinterStatusInfo(raw_code, PrinterStatusKind.UNIT_ERROR, "Unit error: shell motor"),
+            0x00200051: PrinterStatusInfo(raw_code, PrinterStatusKind.UNIT_ERROR, "Unit error: pinch"),
+            0x00200061: PrinterStatusInfo(raw_code, PrinterStatusKind.UNIT_ERROR, "Unit error: pass guide"),
+            0x00200071: PrinterStatusInfo(raw_code, PrinterStatusKind.UNIT_ERROR, "Unit error: skew guide"),
+            0x00200081: PrinterStatusInfo(raw_code, PrinterStatusKind.UNIT_ERROR, "Unit error: skew reject"),
+            0x00200091: PrinterStatusInfo(raw_code, PrinterStatusKind.UNIT_ERROR, "Unit error: shell rotate"),
+            0x002000A1: PrinterStatusInfo(raw_code, PrinterStatusKind.UNIT_ERROR, "Unit error: lever"),
+            0x002000B1: PrinterStatusInfo(raw_code, PrinterStatusKind.UNIT_ERROR, "Unit error: cutter"),
+            0x002000C1: PrinterStatusInfo(raw_code, PrinterStatusKind.UNIT_ERROR, "Unit error: tray out"),
+            0x002000D1: PrinterStatusInfo(raw_code, PrinterStatusKind.UNIT_ERROR, "Unit error: cover out"),
+            0x002000F1: PrinterStatusInfo(raw_code, PrinterStatusKind.UNIT_ERROR, "Unit error: system"),
         }
-        return mapping.get(status, PrinterStatusInfo(f"0x{status:08X}", PrinterStatusKind.UNKNOWN, "Unknown"))
+        if status in mapping:
+            return mapping[status]
+        if (status & 0xFFF00000) == 0x00200000:
+            return PrinterStatusInfo(raw_code, PrinterStatusKind.UNIT_ERROR, "Unit error")
+        return PrinterStatusInfo(raw_code, PrinterStatusKind.UNKNOWN, "Unknown")
 
     @staticmethod
     def _parse_integer_after_prefix(raw: str, prefix_length: int) -> int | None:

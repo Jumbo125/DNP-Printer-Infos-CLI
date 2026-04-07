@@ -666,8 +666,11 @@ class WindowsPrinterDetector:
             )
         transport = WindowsUsbPrinterTransport(printer_name=preferred_printer, selection_hint=preferred_hint)
         device_path = transport.resolve_auto_device_path()
-        resolved_printer_name = preferred_printer or usb_identity.printer_name
-        resolved_model = DnpModelResolver.try_detect_from_text(resolved_printer_name, preferred_hint, usb_identity.friendly_name, usb_identity.device_description)
+        resolved_printer_name = preferred_printer or usb_identity.printer_name or usb_identity.friendly_name or usb_identity.device_description
+        resolved_model = (
+            DnpModelResolver.try_detect_from_text(resolved_printer_name, preferred_hint, usb_identity.friendly_name, usb_identity.device_description)
+            or WindowsUsbVidPidCatalog.try_get_model(usb_identity.vendor_id, usb_identity.product_id)
+        )
         manufacturer = WindowsPrinterDetector._resolve_manufacturer(resolved_printer_name, usb_identity.friendly_name, usb_identity.device_description)
         query_ready = bool(device_path and device_path.strip())
         reason = (

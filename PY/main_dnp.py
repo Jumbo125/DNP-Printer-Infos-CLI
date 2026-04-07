@@ -243,6 +243,15 @@ def detect_printer(options: CliOptions) -> PrinterDetectionResult:
     raise RuntimeError("Only Windows and Linux are currently supported.")
 
 
+def _resolve_detected_model(detection: PrinterDetectionResult | None) -> str | None:
+    if detection is None:
+        return None
+    return getattr(detection, "model", None) or WindowsUsbVidPidCatalog.try_get_model(
+        getattr(detection, "vendor_id", None),
+        getattr(detection, "product_id", None),
+    )
+
+
 def create_transport(options: CliOptions):
     if options.transport == "windows":
         return WindowsUsbPrinterTransport(
@@ -302,28 +311,53 @@ def write_detect(json_output: bool, detection: PrinterDetectionResult) -> int:
     return 0
 
 
-def write_info(json_output: bool, probe: PrinterProbeResult, printer_model: str | None) -> int:
-    remaining_value: Any = probe.remaining_prints.count if probe.remaining_prints.count is not None else probe.remaining_prints.raw_value
-    free_buffer_value: Any = probe.free_buffer.count if probe.free_buffer.count is not None else probe.free_buffer.raw_value
+def write_info(
+    json_output: bool,
+    probe: PrinterProbeResult,
+    printer_model: str | None,
+    printer_model_raw: str | None = None,
+) -> int:
+    remaining_value: Any = (
+        probe.remaining_prints.count
+        if probe.remaining_prints.count is not None
+        else probe.remaining_prints.raw_value
+    )
+    free_buffer_value: Any = (
+        probe.free_buffer.count
+        if probe.free_buffer.count is not None
+        else probe.free_buffer.raw_value
+    )
     status_text = format_status(probe.status)
     media_text = probe.media_type.name if probe.media_type.name.strip() else probe.media_type.raw_value
+
     if json_output:
         payload = {
             "message": "succes",
             "Printermodel": printer_model or "unknown",
+            "Printermodel_raw": printer_model_raw,
             "status": status_text,
+            "status_raw": probe.status.raw_code,
             "Remaining prints": remaining_value,
+            "Remaining prints_raw": probe.remaining_prints.raw_value,
             "Media": media_text,
+            "Media_raw": probe.media_type.raw_value,
             "Free buffer": free_buffer_value,
+            "Free buffer_raw": probe.free_buffer.raw_value,
         }
         print(_json_dumps(payload))
         return 0
+
     print("message: succes")
     print(f"Printermodel: {printer_model or 'unknown'}")
+    print(f"Printermodel_raw: {printer_model_raw or 'n/a'}")
     print(f"status: {status_text}")
+    print(f"status_raw: {probe.status.raw_code}")
     print(f"Remaining prints: {remaining_value}")
+    print(f"Remaining prints_raw: {probe.remaining_prints.raw_value}")
     print(f"Media: {media_text}")
+    print(f"Media_raw: {probe.media_type.raw_value}")
     print(f"Free buffer: {free_buffer_value}")
+    print(f"Free buffer_raw: {probe.free_buffer.raw_value}")
     return 0
 
 
@@ -469,7 +503,12 @@ def run(argv: list[str]) -> int:
         client = DnpProtocolClient(transport)
 
         if options.command in ("info", "probe"):
-            return write_info(options.json, client.probe(), resolve_printer_model(options))
+            probe = client.probe()
+            detection = detect_printer(options)
+            detected_model = _resolve_detected_model(detection)
+            resolved_model = resolve_printer_model(options) or detected_model
+            return write_info(options.json, probe, resolved_model, detected_model)
+        
         if options.command == "status":
             return write_value(options.json, client.get_printer_status())
         if options.command == "remaining":
