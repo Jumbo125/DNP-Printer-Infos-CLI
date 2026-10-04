@@ -1,0 +1,9 @@
+# .NET Build-Output
+bin/
+obj/
+*.pdb
+
+# Fertige Release-Builds (gehören als GitHub-Release-Asset hochgeladen,
+# nicht ins Quellcode-Repo)
+dnp_info_win64bit.zip
+dnp_info_win86bit.zip
