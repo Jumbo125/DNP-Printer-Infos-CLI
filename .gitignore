@@ -7,3 +7,7 @@ obj/
 # nicht ins Quellcode-Repo)
 dnp_info_win64bit.zip
 dnp_info_win86bit.zip
+
+# Interne Arbeitsnotizen/Debug-Artefakte, nicht für GitHub gedacht
+/ANWENDEN.txt
+/all_cs_dump.txt

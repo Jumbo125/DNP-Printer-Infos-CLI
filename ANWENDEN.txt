@@ -1,8 +1,0 @@
-Dies ist der komplette aktuelle Projektstand als ZIP.
-
-Hinweise:
-- Die Projektdatei enthält bereits den Ausschluss für USB_RAW\**, damit die doppelten Typen nicht mehr kompiliert werden.
-- Der Ordner USB_RAW ist in dieser Gesamt-ZIP nicht enthalten.
-- Bitte lokal neu entpacken und dann das Projekt frisch bauen.
-
-Dieser Stand filtert Windows-USB-Treffer strikt auf die in cspstatx64.dll gefundenen DNP VID/PID-Kombinationen.
