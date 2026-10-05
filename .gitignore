@@ -8,6 +8,10 @@ obj/
 dnp_info_win64bit.zip
 dnp_info_win86bit.zip
 
+# Redundante ZIP-Kopie, Inhalt liegt bereits unversioniert sauber in py/
+/py_files.zip
+
 # Interne Arbeitsnotizen/Debug-Artefakte, nicht für GitHub gedacht
 /ANWENDEN.txt
 /all_cs_dump.txt
+/MIGRATION_NOTES.md
